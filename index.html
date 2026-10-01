@@ -1,0 +1,834 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gojo Honkai - Bio Profile</title>
+  
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@700&family=Outfit:wght@600;700;800&family=Quicksand:wght@600;700&display=swap" rel="stylesheet">
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Outfit', 'Quicksand', sans-serif;
+      user-select: none;
+      -webkit-user-select: none;
+      -webkit-user-drag: none;
+    }
+
+    /* Bảo vệ toàn bộ hình ảnh và video khỏi tương tác chuột */
+    img, video {
+      pointer-events: none;
+      -webkit-user-drag: none;
+      user-select: none;
+    }
+
+    body {
+      min-height: 100vh;
+      background-color: #050807;
+      color: #fff;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 20px 12px 40px 12px;
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    /* --- VIDEO NỀN & OVERLAY --- */
+    #bg-video {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      object-fit: cover;
+      z-index: -2;
+      filter: brightness(0.85) contrast(1.05);
+    }
+
+    .bg-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: radial-gradient(circle at center, rgba(10, 30, 15, 0.4) 0%, rgba(5, 5, 8, 0.85) 100%);
+      z-index: -1;
+      pointer-events: none;
+    }
+
+    /* --- TOAST NOTIFICATIONS --- */
+    .toast-container {
+      position: fixed;
+      top: 15px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      width: 90%;
+      max-width: 300px;
+      pointer-events: none;
+    }
+
+    .toast {
+      background: rgba(20, 20, 25, 0.92);
+      border: 1px solid rgba(255, 60, 80, 0.6);
+      backdrop-filter: blur(12px);
+      color: #fff;
+      padding: 8px 14px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.6);
+      animation: slideDown 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+      pointer-events: auto;
+    }
+
+    .toast-content {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .toast-icon {
+      color: #ff4757;
+      font-size: 14px;
+    }
+
+    .toast-close {
+      cursor: pointer;
+      color: rgba(255,255,255,0.5);
+      font-size: 12px;
+      transition: color 0.2s;
+    }
+
+    .toast-close:hover {
+      color: #fff;
+    }
+
+    @keyframes slideDown {
+      from { opacity: 0; transform: translateY(-15px) scale(0.95); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    @keyframes fadeOut {
+      to { opacity: 0; transform: translateY(-10px) scale(0.9); }
+    }
+
+    /* --- NÚT ÂM THANH NHẠC (GÓC TRÁI) --- */
+    .volume-btn {
+      position: fixed;
+      top: 18px;
+      left: 18px;
+      width: 42px;
+      height: 42px;
+      border-radius: 12px;
+      background: rgba(120, 20, 50, 0.65);
+      border: 1px solid rgba(255, 100, 150, 0.4);
+      color: #ff6596;
+      font-size: 17px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+      transition: all 0.25s ease;
+      z-index: 100;
+    }
+
+    .volume-btn:hover {
+      background: rgba(160, 25, 70, 0.85);
+      transform: scale(1.08);
+      color: #fff;
+    }
+
+    /* --- CONTAINER CHÍNH --- */
+    .app-container {
+      width: 100%;
+      max-width: 400px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      margin-top: 10px;
+      z-index: 1;
+    }
+
+    /* --- GLASS CARD STYLE --- */
+    .glass-card {
+      background: rgba(20, 16, 24, 0.72);
+      border: 1.5px solid rgba(255, 70, 130, 0.4);
+      border-radius: 26px;
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      box-shadow: 0 12px 35px rgba(0, 0, 0, 0.6), 
+                  0 0 20px rgba(255, 50, 120, 0.15);
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* --- CARD PROFILE CHÍNH --- */
+    .main-card .banner-container {
+      width: 100%;
+      height: 120px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .main-card .banner-container img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .main-card .card-body {
+      padding: 0 20px 22px 20px;
+      position: relative;
+    }
+
+    /* Avatar Khung Tròn */
+    .avatar-wrapper {
+      position: relative;
+      width: 100px;
+      height: 100px;
+      margin-top: -50px;
+      border-radius: 50%;
+      padding: 3px;
+      background: linear-gradient(135deg, #a8ff78, #78ffd6, #ff75a0);
+      box-shadow: 0 8px 25px rgba(0,0,0,0.6);
+    }
+
+    .avatar-wrapper img {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid #121218;
+    }
+
+    /* Khung Thống Kê (Eye & Heart) */
+    .stats-container {
+      position: absolute;
+      top: 14px;
+      right: 18px;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 6px;
+    }
+
+    .stat-badge {
+      background: rgba(10, 8, 14, 0.65);
+      padding: 4px 12px;
+      border-radius: 18px;
+      font-size: 13px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      backdrop-filter: blur(8px);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      position: relative;
+    }
+
+    .stat-badge i.fa-eye { color: #78ffd6; }
+    .stat-badge i.fa-heart { color: #ff6584; }
+
+    /* Pop-up Like bên cạnh nút Tim */
+    .like-popup {
+      position: absolute;
+      right: 105%;
+      top: 50%;
+      transform: translateY(-50%);
+      background: rgba(15, 12, 18, 0.85);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      padding: 3px 8px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 700;
+      white-space: nowrap;
+      display: none;
+      animation: fadeIn 0.2s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-50%) translateX(5px); }
+      to { opacity: 1; transform: translateY(-50%) translateX(0); }
+    }
+
+    /* Tên & Bio chuẩn Font */
+    .profile-name {
+      font-family: 'Comfortaa', 'Outfit', cursive;
+      font-size: 30px;
+      font-weight: 700;
+      margin-top: 12px;
+      color: #ffffff;
+      text-shadow: 0 0 15px rgba(255, 100, 160, 0.7);
+      letter-spacing: -0.5px;
+    }
+
+    .profile-bio {
+      font-family: 'Outfit', sans-serif;
+      font-size: 14px;
+      font-weight: 700;
+      color: #38ef7d;
+      text-shadow: 0 0 8px rgba(56, 239, 125, 0.6);
+      margin-top: 6px;
+      line-height: 1.4;
+    }
+
+    /* Social Icons Box */
+    .social-box {
+      margin-top: 18px;
+      background: rgba(12, 10, 16, 0.5);
+      border: 1px solid rgba(255, 100, 160, 0.2);
+      border-radius: 25px;
+      padding: 8px 16px;
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+    }
+
+    .social-icon {
+      color: #ff6596;
+      font-size: 20px;
+      text-decoration: none;
+      transition: all 0.25s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+    }
+
+    .social-icon:hover {
+      color: #ffffff;
+      transform: scale(1.15);
+      background: rgba(255, 101, 150, 0.2);
+    }
+
+    /* --- THẺ SUB PROFILE --- */
+    .sub-card {
+      padding: 14px 18px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      border-color: rgba(80, 250, 160, 0.35);
+    }
+
+    .sub-avatar-container {
+      position: relative;
+      width: 56px;
+      height: 56px;
+      flex-shrink: 0;
+    }
+
+    .sub-avatar-container img {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .status-dot {
+      position: absolute;
+      bottom: 1px;
+      right: 1px;
+      width: 13px;
+      height: 13px;
+      background-color: #2ed573;
+      border-radius: 50%;
+      border: 2px solid #14141c;
+      box-shadow: 0 0 8px #2ed573;
+    }
+
+    .sub-info h3 {
+      font-family: 'Comfortaa', sans-serif;
+      font-size: 17px;
+      color: #ffffff;
+    }
+
+    .sub-info p {
+      font-size: 12px;
+      color: #ffeaa7;
+      font-weight: 700;
+      margin-top: 1px;
+    }
+
+    .action-btn {
+      display: inline-block;
+      margin-top: 6px;
+      padding: 5px 14px;
+      background: linear-gradient(90deg, #11998e, #38ef7d);
+      color: #ffffff;
+      font-size: 11px;
+      font-weight: 700;
+      border-radius: 18px;
+      border: none;
+      cursor: pointer;
+    }
+
+    /* --- THẺ STORE LINK --- */
+    .link-card {
+      padding: 14px 18px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      text-decoration: none;
+      color: inherit;
+    }
+
+    .link-card .icon-thumb {
+      width: 52px;
+      height: 52px;
+      border-radius: 14px;
+      overflow: hidden;
+      flex-shrink: 0;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .link-card .icon-thumb img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .link-card .link-text h3 {
+      font-family: 'Comfortaa', sans-serif;
+      font-size: 16px;
+      color: #fff;
+    }
+
+    .link-card .link-text p {
+      font-size: 11px;
+      color: rgba(255, 255, 255, 0.7);
+      word-break: break-all;
+      margin-top: 3px;
+      font-weight: 600;
+    }
+
+    /* --- TRÌNH PHÁT NHẠC --- */
+    .music-card {
+      padding: 12px 16px;
+      background: rgba(16, 12, 20, 0.8);
+    }
+
+    .music-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .music-cover {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+
+    .music-cover img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .music-details {
+      flex-grow: 1;
+      overflow: hidden;
+    }
+
+    .music-title {
+      font-family: 'Outfit', sans-serif;
+      font-size: 14px;
+      font-weight: 700;
+      color: #ffffff;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .music-controls-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 4px;
+    }
+
+    .time-text {
+      font-size: 11px;
+      font-weight: 700;
+      color: rgba(255, 255, 255, 0.6);
+      min-width: 26px;
+    }
+
+    .progress-bar-container {
+      flex-grow: 1;
+      height: 6px;
+      background: rgba(255, 255, 255, 0.15);
+      border-radius: 10px;
+      position: relative;
+      cursor: pointer;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      width: 0%;
+      background: #ff6596;
+      border-radius: 10px;
+    }
+
+    .music-buttons {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: #ff6596;
+      font-size: 15px;
+    }
+
+    .music-btn {
+      cursor: pointer;
+      transition: transform 0.2s ease;
+    }
+
+    .music-btn:hover {
+      transform: scale(1.15);
+    }
+  </style>
+</head>
+<body oncontextmenu="return false;">
+
+  <!-- Video nền loại bỏ tương tác & menu chuột phải -->
+  <video id="bg-video" autoplay loop muted playsinline controlslist="nodownload noresponsive noremoteplayback" disablepictureinpicture controlsloader="false" oncontextmenu="return false;">
+    <source src="2.mp4" type="video/mp4">
+  </video>
+  <div class="bg-overlay"></div>
+
+  <button class="volume-btn" id="volumeBtn" title="Bật/Tắt Nhạc">
+    <i class="fa-solid fa-volume-xmark" id="volumeIcon"></i>
+  </button>
+
+  <div class="toast-container" id="toastContainer"></div>
+
+  <div class="app-container">
+
+    <div class="glass-card main-card">
+      <div class="banner-container">
+        <img src="2.jpg" alt="Banner" draggable="false" oncontextmenu="return false;">
+      </div>
+
+      <div class="card-body">
+        <div class="avatar-wrapper">
+          <img src="1.jpg" alt="Avatar" draggable="false" oncontextmenu="return false;">
+        </div>
+
+        <div class="stats-container">
+          <div class="stat-badge">
+            <i class="fa-solid fa-eye"></i> <span id="viewCount">2,000</span>
+          </div>
+          <div class="stat-badge" id="likeBtn">
+            <span class="like-popup" id="likePopup"><i class="fa-solid fa-chevron-left"></i> Like</span>
+            <i class="fa-solid fa-heart"></i> <span id="likeCount">145</span>
+          </div>
+        </div>
+
+        <h1 class="profile-name">Gojo Honkai</h1>
+        <p class="profile-bio">Liên Hệ Nạp Game Mua Acc HSR/WW/ZZZ/A9... Tại ronshop247.net 🥰</p>
+
+        <div class="social-box">
+          <a href="" class="social-icon" target="_blank"><i class="fa-brands fa-facebook-f"></i></a>
+          <a href="https://tiktok.com/@burhjjzz23" class="social-icon" target="_blank"><i class="fa-brands fa-tiktok"></i></a>
+          <a href="" class="social-icon" target="_blank" title="Discord"><i class="fa-brands fa-discord"></i></a>
+          <a href="" class="social-icon" target="_blank" title="Website"><i class="fa-solid fa-globe"></i></a>
+        </div>
+      </div>
+    </div>
+
+    <div class="glass-card sub-card">
+      <div class="sub-avatar-container">
+        <img src="3.jpg" alt="Sub Avatar" draggable="false" oncontextmenu="return false;">
+        <span class="status-dot"></span>
+      </div>
+      <div class="sub-info">
+        <h3>Donate Trên MB Bank.</h3>
+        <p>Giúp Tôi Với👇</p>
+        <button class="action-btn" onclick="window.open('https://raw.githubusercontent.com/DichTruyenDrop/Bio1/refs/heads/main/0.jpg', '_blank')">Nhấp Vào Đây</button>
+      </div>
+    </div>
+
+    <a href="https://ronshop247.net/" target="_blank" class="glass-card link-card">
+      <div class="icon-thumb">
+        <img src="5.png" alt="Shop Icon" draggable="false" oncontextmenu="return false;">
+      </div>
+      <div class="link-text">
+        <h3>Mua Acc Ở đâyyyyy 👇</h3>
+        <p>https://ronshop247.net/</p>
+      </div>
+    </a>
+
+    <div class="glass-card music-card">
+      <div class="music-header">
+        <div class="music-cover">
+          <img src="1.jpg" alt="Song Cover" draggable="false" oncontextmenu="return false;">
+        </div>
+        <div class="music-details">
+          <div class="music-title">Follow Tôi Đi!!</div>
+          <div class="music-controls-row">
+            <span class="time-text" id="currentTime">0:12</span>
+            <div class="progress-bar-container" id="progressBar">
+              <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <span class="time-text" id="durationTime">0:19</span>
+            <div class="music-buttons">
+              <i class="fa-solid fa-backward-step music-btn" id="rewindBtn"></i>
+              <i class="fa-solid fa-play music-btn" id="playPauseIcon"></i>
+              <i class="fa-solid fa-forward-step music-btn" id="forwardBtn"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+      <audio id="audioTrack" src="nhacnen.mp3" autoplay loop></audio>
+    </div>
+
+  </div>
+
+  <script>
+    /* --- HỆ THỐNG BẢO VỆ CHỐNG TẢI VIDEO & ANH --- */
+    // 1. Vô hiệu hóa chuột phải trên toàn bộ trang
+    document.addEventListener('contextmenu', (e) => e.preventDefault());
+
+    // 2. Chặn thao tác kéo thả ảnh / video
+    document.addEventListener('dragstart', (e) => {
+      if (e.target.tagName === 'IMG' || e.target.tagName === 'VIDEO') {
+        e.preventDefault();
+      }
+    });
+
+    // 3. Chặn các phím tắt DevTools & Save trang
+    document.addEventListener('keydown', (e) => {
+      // Chặn F12
+      if (e.key === 'F12') {
+        e.preventDefault();
+      }
+      // Chặn Ctrl+U, Ctrl+S, Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+Shift+C
+      if (e.ctrlKey && (
+        e.key === 'u' || e.key === 'U' || 
+        e.key === 's' || e.key === 'S' ||
+        (e.shiftKey && (e.key === 'I' || e.key === 'i' || e.key === 'J' || e.key === 'j' || e.key === 'C' || e.key === 'c'))
+      )) {
+        e.preventDefault();
+      }
+    });
+
+    /* --- SỰ KIỆN TRÌNH PHÁT NHẠC & PROFILE --- */
+    const volumeBtn = document.getElementById('volumeBtn');
+    const volumeIcon = document.getElementById('volumeIcon');
+    const likeBtn = document.getElementById('likeBtn');
+    const likePopup = document.getElementById('likePopup');
+    const toastContainer = document.getElementById('toastContainer');
+
+    const audioTrack = document.getElementById('audioTrack');
+    const playPauseIcon = document.getElementById('playPauseIcon');
+    const progressFill = document.getElementById('progressFill');
+    const progressBar = document.getElementById('progressBar');
+    const currentTimeElem = document.getElementById('currentTime');
+    const durationTimeElem = document.getElementById('durationTime');
+
+    function updateAudioUI(isPlaying) {
+      if (isPlaying) {
+        playPauseIcon.className = 'fa-solid fa-pause music-btn';
+        volumeIcon.className = 'fa-solid fa-volume-high';
+      } else {
+        playPauseIcon.className = 'fa-solid fa-play music-btn';
+        volumeIcon.className = 'fa-solid fa-volume-xmark';
+      }
+    }
+
+    function toggleAudio() {
+      if (audioTrack.paused) {
+        audioTrack.play().then(() => updateAudioUI(true)).catch(e => console.log(e));
+      } else {
+        audioTrack.pause();
+        updateAudioUI(false);
+      }
+    }
+
+    volumeBtn.addEventListener('click', toggleAudio);
+    playPauseIcon.addEventListener('click', toggleAudio);
+
+    function attemptAutoplay() {
+      audioTrack.play().then(() => {
+        updateAudioUI(true);
+      }).catch(() => {
+        const enableAudioOnUserInteraction = () => {
+          audioTrack.play().then(() => updateAudioUI(true));
+          document.removeEventListener('click', enableAudioOnUserInteraction);
+          document.removeEventListener('touchstart', enableAudioOnUserInteraction);
+        };
+        document.addEventListener('click', enableAudioOnUserInteraction);
+        document.addEventListener('touchstart', enableAudioOnUserInteraction);
+      });
+    }
+
+    window.addEventListener('DOMContentLoaded', attemptAutoplay);
+
+    // Toast Notification
+    function showToast(message) {
+      const toast = document.createElement('div');
+      toast.className = 'toast';
+      toast.innerHTML = `
+        <div class="toast-content">
+          <i class="fa-solid fa-circle-xmark toast-icon"></i>
+          <span>${message}</span>
+        </div>
+        <i class="fa-solid fa-xmark toast-close"></i>
+      `;
+
+      toast.querySelector('.toast-close').addEventListener('click', () => {
+        toast.style.animation = 'fadeOut 0.2s forwards';
+        setTimeout(() => toast.remove(), 200);
+      });
+
+      toastContainer.appendChild(toast);
+
+      setTimeout(() => {
+        if (toast.parentNode) {
+          toast.style.animation = 'fadeOut 0.2s forwards';
+          setTimeout(() => toast.remove(), 200);
+        }
+      }, 3000);
+    }
+
+    // Xử lý đếm lượt xem & thả tim
+    const viewCountElem = document.getElementById('viewCount');
+    const likeCountElem = document.getElementById('likeCount');
+    
+    const API_WORKSPACE = "cogidichday_bio_v1";
+    const BASE_VIEWS = 2000;
+    const BASE_LIKES = 145;
+
+    function animateValue(obj, start, end, duration) {
+      if (start === end) {
+        obj.innerText = end.toLocaleString();
+        return;
+      }
+      let startTimestamp = null;
+      const step = (timestamp) => {
+        if (!startTimestamp) startTimestamp = timestamp;
+        const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+        const currentCount = Math.floor(progress * (end - start) + start);
+        obj.innerText = currentCount.toLocaleString();
+        if (progress < 1) {
+          window.requestAnimationFrame(step);
+        }
+      };
+      window.requestAnimationFrame(step);
+    }
+
+    const cachedViews = localStorage.getItem('cached_total_views');
+    const startViews = cachedViews ? parseInt(cachedViews) : BASE_VIEWS;
+    viewCountElem.innerText = startViews.toLocaleString();
+
+    const cachedLikes = localStorage.getItem('cached_total_likes');
+    const startLikes = cachedLikes ? parseInt(cachedLikes) : BASE_LIKES;
+    likeCountElem.innerText = startLikes.toLocaleString();
+
+    fetch(`https://api.counterapi.dev/v1/${API_WORKSPACE}/views/up`)
+      .then(res => res.json())
+      .then(data => {
+        if (data && data.count !== undefined) {
+          const totalViews = BASE_VIEWS + data.count;
+          animateValue(viewCountElem, startViews, totalViews, 800);
+          localStorage.setItem('cached_total_views', totalViews);
+        }
+      })
+      .catch(() => {
+        viewCountElem.innerText = startViews.toLocaleString();
+      });
+
+    function loadGlobalLikes() {
+      fetch(`https://api.counterapi.dev/v1/${API_WORKSPACE}/likes/`)
+        .then(res => res.json())
+        .then(data => {
+          if (data && data.count !== undefined) {
+            const totalLikes = BASE_LIKES + data.count;
+            animateValue(likeCountElem, startLikes, totalLikes, 800);
+            localStorage.setItem('cached_total_likes', totalLikes);
+          }
+        })
+        .catch(() => {
+          likeCountElem.innerText = startLikes.toLocaleString();
+        });
+    }
+    loadGlobalLikes();
+
+    let hasLiked = localStorage.getItem('user_has_liked_cogidichday') === 'true';
+
+    likeBtn.addEventListener('click', () => {
+      likePopup.style.display = 'block';
+
+      if (!hasLiked) {
+        fetch(`https://api.counterapi.dev/v1/${API_WORKSPACE}/likes/up`)
+          .then(res => res.json())
+          .then(data => {
+            if (data && data.count !== undefined) {
+              const currentLikes = parseInt(likeCountElem.innerText.replace(/,/g, '')) || BASE_LIKES;
+              const totalLikes = BASE_LIKES + data.count;
+              animateValue(likeCountElem, currentLikes, totalLikes, 400);
+              localStorage.setItem('cached_total_likes', totalLikes);
+            }
+            localStorage.setItem('user_has_liked_cogidichday', 'true');
+            hasLiked = true;
+            showToast('Cảm ơn bạn đã thả tim!');
+          })
+          .catch(() => {
+            showToast('Lỗi kết nối máy chủ, vui lòng thử lại!');
+          });
+      } else {
+        showToast('Bạn đã thả tim rồi!');
+      }
+    });
+
+    function formatTime(seconds) {
+      if (isNaN(seconds)) return "0:00";
+      const mins = Math.floor(seconds / 60);
+      const secs = Math.floor(seconds % 60);
+      return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+    }
+
+    audioTrack.addEventListener('timeupdate', () => {
+      if (audioTrack.duration) {
+        const progressPercent = (audioTrack.currentTime / audioTrack.duration) * 100;
+        progressFill.style.width = `${progressPercent}%`;
+        currentTimeElem.innerText = formatTime(audioTrack.currentTime);
+        durationTimeElem.innerText = formatTime(audioTrack.duration);
+      }
+    });
+
+    progressBar.addEventListener('click', (e) => {
+      const width = progressBar.clientWidth;
+      const clickX = e.offsetX;
+      if (audioTrack.duration) {
+        audioTrack.currentTime = (clickX / width) * audioTrack.duration;
+      }
+    });
+
+    document.getElementById('rewindBtn').addEventListener('click', () => audioTrack.currentTime -= 3);
+    document.getElementById('forwardBtn').addEventListener('click', () => audioTrack.currentTime += 3);
+  </script>
+</body>
+</html>
